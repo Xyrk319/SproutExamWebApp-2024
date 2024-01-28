@@ -23,9 +23,9 @@ This is a Salary Calculator system based on the Technical Exam boilerplate given
 5. Open browser and go to localhost:5001 (default port in the code)
 
 ## API Endpoints
-### GET /api/employees
-### GET /api/employees/{id}
-### PUT /api/employees/{id}
-### POST /api/employees
-### DELETE /api/employees/{id}
-### POST /api/employees/{id}/calculate
+- GET /api/employees
+- GET /api/employees/{id}
+- PUT /api/employees/{id}
+- POST /api/employees
+- DELETE /api/employees/{id}
+- POST /api/employees/{id}/calculate
