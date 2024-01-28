@@ -58,6 +58,11 @@ namespace Sprout.Exam.WebApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, EditEmployeeDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
             if (employee == null) return NotFound();
             employee.FullName = request.FullName;
@@ -78,11 +83,15 @@ namespace Sprout.Exam.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(CreateEmployeeDto request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var employee = new Employee
             {
                 FullName = request.FullName,
                 Tin = request.Tin,
-                Birthdate = request.Birthdate, // Convert string to DateTime
+                Birthdate = request.Birthdate,
                 EmployeeTypeId = request.EmployeeTypeId,
             };
 
