@@ -11,6 +11,7 @@ using Sprout.Exam.Business.DataTransferObjects;
 using Sprout.Exam.Common.Enums;
 using Sprout.Exam.WebApp.Data;
 using Sprout.Exam.Business.Models;
+using Sprout.Exam.WebApp.Factories;
 
 namespace Sprout.Exam.WebApp.Controllers
 {
@@ -120,31 +121,15 @@ namespace Sprout.Exam.WebApp.Controllers
         [HttpPost("{id}/calculate")]
         public async Task<IActionResult> Calculate(int id, SalaryCalculationDto request)
         {
-            _logger.LogInformation($"Employee id: {id}, Absent Days: {request.AbsentDays}, Worked Days: {request.WorkedDays}");
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
             if (employee == null) return NotFound();
             
-            var type = (EmployeeType)employee.EmployeeTypeId;
-            decimal salary;
-            switch (type)
-            {
-                case EmployeeType.Regular:
-                    decimal basicSalary = 20000;
-                    decimal tax = 0.12m;
-                    decimal absentDeduction = basicSalary / 22 * request.AbsentDays;
-                    salary = basicSalary - absentDeduction - (basicSalary * tax);
-                    _logger.LogInformation($"Regular employee salary calculated: {salary}, Tax: {tax}, Absent Deduction: {absentDeduction}, Absent Days: {request.AbsentDays}");
-                    return Ok(decimal.Round(salary, 2));
+            var factory = new SalaryCalculatorFactory();
+            var calculator = factory.GetCalculator((EmployeeType)employee.EmployeeTypeId);
+            decimal salary = calculator.CalculateSalary(request);
 
-                case EmployeeType.Contractual:
-                    decimal rate = 500;
-                    salary = rate * request.WorkedDays;
-                    _logger.LogInformation($"Contractual employee salary calculated: {salary}, Rate: {rate}, Worked Days: {request.WorkedDays}");
-                    return Ok(decimal.Round(salary, 2));
-
-                default:
-                    return NotFound("Employee Type not found");
-            }
+            _logger.LogInformation($"Salary calculated: {salary}");
+            return Ok(decimal.Round(salary, 2));
         }
     }
 }
